@@ -1,0 +1,18 @@
+spring:
+  application:
+    name: currency-exchange-spring-boot
+  datasource:
+    url: jdbc:postgresql://localhost:5432/postgres
+    username: postgres
+    password: ''
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: validate
+  liquibase:
+    change-log: classpath:/db/changelog/db.changelog-master.xml
+
+openweather:
+  api-key: 00c42ff013e5b512602ccacd97da9191
+  geo-url: http://api.openweathermap.org/geo/1.0/direct
+  weather-url: https://api.openweathermap.org/data/2.5/weather
