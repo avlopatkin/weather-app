@@ -1,6 +1,6 @@
 spring:
   application:
-    name: currency-exchange-spring-boot
+    name: weather-app
   datasource:
     url: jdbc:postgresql://localhost:5432/postgres
     username: postgres
@@ -13,6 +13,7 @@ spring:
     change-log: classpath:/db/changelog/db.changelog-master.xml
 
 openweather:
-  api-key: 00c42ff013e5b512602ccacd97da9191
-  geo-url: http://api.openweathermap.org/geo/1.0/direct
-  weather-url: https://api.openweathermap.org/data/2.5/weather
+  api-key: 0c42ff@13e5b512602ccacd97da9191
+  base-url: https://api.openweathermap.org
+  geocoding-path: /geo/1.0/direct
+  weather-path: /data/2.5/weather

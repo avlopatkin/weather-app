@@ -3,8 +3,11 @@
         xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
-                      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.19.xsd">
+                      https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.19.xsd">
 
-    <include file="db/changelog/001-create-locations-table.xml" relativeToChangelogFile="true"/>
+    <include file="001-create-locations-table.xml" relativeToChangelogFile="true"/>
+    <include file="002-alter-locations.xml" relativeToChangelogFile="true"/>
+    <include file="003-create-users-table.xml" relativeToChangelogFile="true"/>
+    <include file="004-add-user-reference.xml" relativeToChangelogFile="true"/>
 
 </databaseChangeLog>
