@@ -5,9 +5,5 @@
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
                       https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.19.xsd">
 
-    <include file="001-create-locations-table.xml" relativeToChangelogFile="true"/>
-    <include file="002-alter-locations.xml" relativeToChangelogFile="true"/>
-    <include file="003-create-users-table.xml" relativeToChangelogFile="true"/>
-    <include file="004-add-user-reference.xml" relativeToChangelogFile="true"/>
-
+    <include file="001-initial-schema.xml" relativeToChangelogFile="true"/>
 </databaseChangeLog>
