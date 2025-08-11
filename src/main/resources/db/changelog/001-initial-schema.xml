@@ -40,4 +40,12 @@
         </sql>
     </changeSet>
 
+    <changeSet id="004-add-users-login-unique-index" author="andreilopatkin">
+        <sql>
+            <![CDATA[
+            CREATE UNIQUE INDEX IF NOT EXISTS idx_users_login ON users(login);
+            ]]>
+        </sql>
+    </changeSet>
+
 </databaseChangeLog>
