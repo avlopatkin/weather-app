@@ -1,0 +1,19 @@
+spring:
+  application:
+    name: weather-app
+  datasource:
+    url: jdbc:postgresql://localhost:5432/weatherdb
+    username: postgres
+    password: ''
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: validate
+  liquibase:
+    change-log: classpath:/db/changelog/db.changelog-master.xml
+
+openweather:
+  api-key: 0c42ff@13e5b512602ccacd97da9191
+  base-url: https://api.openweathermap.org
+  geocoding-path: /geo/1.0/direct
+  weather-path: /data/2.5/weather

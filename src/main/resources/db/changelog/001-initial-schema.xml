@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                      https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.19.xsd">
+
+    <changeSet id="001-create-users-table" author="andreilopatkin">
+        <sql>
+            <![CDATA[
+            CREATE TABLE IF NOT EXISTS users (
+                id SERIAL PRIMARY KEY,
+                login VARCHAR(255) NOT NULL UNIQUE,
+                password VARCHAR(255) NOT NULL
+                );
+            ]]>
+        </sql>
+    </changeSet>
+
+    <changeSet id="002-create-locations-table" author="andreilopatkin">
+        <sql>
+            <![CDATA[
+            CREATE TABLE IF NOT EXISTS locations (
+                id SERIAL PRIMARY KEY,
+                name VARCHAR(255) NOT NULL,
+                user_id BIGINT NOT NULL,
+                latitude NUMERIC(10,8) NOT NULL,
+                longitude NUMERIC(11,8) NOT NULL,
+                CONSTRAINT fk_locations_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+                );
+            ]]>
+        </sql>
+    </changeSet>
+
+    <changeSet id="003-add-locations-index" author="andreilopatkin">
+        <sql>
+            <![CDATA[
+            CREATE INDEX IF NOT EXISTS idx_locations_name ON locations(name);
+            ]]>
+        </sql>
+    </changeSet>
+
+    <changeSet id="004-add-users-login-unique-index" author="andreilopatkin">
+        <sql>
+            <![CDATA[
+            CREATE UNIQUE INDEX IF NOT EXISTS idx_users_login ON users(login);
+            ]]>
+        </sql>
+    </changeSet>
+
+</databaseChangeLog>
