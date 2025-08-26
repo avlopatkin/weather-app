@@ -13,4 +13,6 @@ public interface LocationRepository extends JpaRepository<Location, Long> {
     List<Location> findAllByUser(User user);
 
     Optional<Location> findByUserAndName(User user, String name);
+
+    Optional<Location> findByIdAndUserId(Long id, Long userId);
 }
