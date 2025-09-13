@@ -2,7 +2,6 @@ package com.weather.weather_mvp.controller;
 
 import com.weather.weather_mvp.dto.LocationDto;
 import com.weather.weather_mvp.dto.LocationResponseDto;
-import com.weather.weather_mvp.dto.MessageResponseDto;
 import com.weather.weather_mvp.service.LocationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -35,8 +34,8 @@ public class LocationController {
     }
 
     @DeleteMapping("/{locationId}")
-    public ResponseEntity<MessageResponseDto> deleteLocation(@PathVariable Long locationId) {
-        MessageResponseDto response = locationService.deleteLocation(MOCKED_USER_ID, locationId);
-        return ResponseEntity.ok(response);
+    public ResponseEntity<Void> deleteLocation(@PathVariable Long locationId) {
+        locationService.deleteLocation(MOCKED_USER_ID, locationId);
+        return ResponseEntity.noContent().build();
     }
 }

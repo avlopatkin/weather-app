@@ -16,7 +16,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
-import org.testcontainers.shaded.com.fasterxml.jackson.databind.ObjectMapper;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
@@ -48,8 +47,7 @@ class LocationControllerTest {
 
     @BeforeEach
     void setUp() {
-        String insertUserSql = "INSERT INTO users (id, login, password) VALUES (1, 'testuser', 'password')";
-        jdbcTemplate.update(insertUserSql);
+        jdbcTemplate.update("INSERT INTO users (id, login, password) VALUES (1, 'testuser', 'password')");
     }
 
     @AfterEach

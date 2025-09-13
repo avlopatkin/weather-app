@@ -2,7 +2,6 @@ package com.weather.weather_mvp.service;
 
 import com.weather.weather_mvp.dto.LocationDto;
 import com.weather.weather_mvp.dto.LocationResponseDto;
-import com.weather.weather_mvp.dto.MessageResponseDto;
 import com.weather.weather_mvp.entity.Location;
 import com.weather.weather_mvp.entity.User;
 import com.weather.weather_mvp.exception.ResourceNotFoundException;
@@ -13,7 +12,6 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -24,8 +22,6 @@ import java.util.stream.Collectors;
 public class LocationService {
     private final LocationRepository locationRepository;
     private final UserRepository userRepository;
-
-    private static final long MOCKED_USER_ID = 1L;
 
     @Cacheable(value = "locations", key = "#userId")
     @Transactional(readOnly = true)
@@ -56,21 +52,14 @@ public class LocationService {
                 .build();
     }
 
-    @CacheEvict(value = "locations", key = "#userId")
     @Transactional
-    public MessageResponseDto deleteLocation(Long userId, Long locationId) {
-        if(!userRepository.existsById(userId)) {
-            throw new ResourceNotFoundException("User not found with id: " + userId);
+    @CacheEvict(value = "locations", key = "#userId")
+    public void deleteLocation(Long userId, Long locationId) {
+        int deletedRows = locationRepository.deleteByIdAndUserId(locationId, userId);
+
+        if (deletedRows == 0) {
+            throw new ResourceNotFoundException("Location not found with id: " + locationId + " for user: " + userId);
         }
-
-        Location locationToDelete = locationRepository.findByIdAndUserId(locationId, userId)
-                .orElseThrow(() -> new ResourceNotFoundException("Location not found with id: " + locationId + " for user " + userId));
-
-        locationRepository.delete(locationToDelete);
-
-        return MessageResponseDto.builder()
-                .message("Location '" + locationToDelete.getName() + "' was successfully deleted.")
-                .build();
     }
 
     private LocationDto mapToLocationDto(Location location) {
