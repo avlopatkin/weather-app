@@ -1,5 +1,6 @@
 package com.weather.weather_mvp.controller;
 
+import com.weather.weather_mvp.dto.GeocodingResponse;
 import com.weather.weather_mvp.dto.LocationDto;
 import com.weather.weather_mvp.dto.LocationResponseDto;
 import com.weather.weather_mvp.service.LocationService;
@@ -38,4 +39,11 @@ public class LocationController {
         locationService.deleteLocation(MOCKED_USER_ID, locationId);
         return ResponseEntity.noContent().build();
     }
+
+    @GetMapping("/search")
+    public ResponseEntity<List<GeocodingResponse>> searchLocationsByName(@RequestParam String name) {
+        List<GeocodingResponse> results = locationService.searchLocationsByName(name);
+        return ResponseEntity.ok(results);
+    }
+
 }

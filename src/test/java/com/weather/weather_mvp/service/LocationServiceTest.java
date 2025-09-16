@@ -1,5 +1,6 @@
 package com.weather.weather_mvp.service;
 
+import com.weather.weather_mvp.dto.GeocodingResponse;
 import com.weather.weather_mvp.dto.LocationDto;
 import com.weather.weather_mvp.dto.LocationResponseDto;
 import com.weather.weather_mvp.entity.Location;
@@ -29,6 +30,9 @@ class LocationServiceTest {
 
     @Mock
     private UserRepository userRepository;
+
+    @Mock
+    private OpenWeatherService openWeatherService;
 
     @InjectMocks
     private LocationService locationService;
@@ -96,5 +100,22 @@ class LocationServiceTest {
         assertThrows(ResourceNotFoundException.class, () -> locationService.deleteLocation(userId, locationId));
 
         verify(locationRepository, times(1)).deleteByIdAndUserId(locationId, userId);
+    }
+
+    @Test
+    void searchLocationsByName_ShouldReturnGeocodingResponse() {
+        GeocodingResponse geocodingResponse = new GeocodingResponse();
+        geocodingResponse.setName("Paris");
+        geocodingResponse.setCountry("FR");
+
+        when(openWeatherService.searchLocationsByName("Paris"))
+                .thenReturn(List.of(geocodingResponse));
+
+        List<GeocodingResponse> result = locationService.searchLocationsByName("Paris");
+
+        assertThat(result).isNotNull();
+        assertThat(result).hasSize(1);
+        assertThat(result.get(0).getName()).isEqualTo("Paris");
+        assertThat(result.get(0).getCountry()).isEqualTo("FR");
     }
 }

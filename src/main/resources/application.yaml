@@ -13,7 +13,7 @@ spring:
     change-log: classpath:/db/changelog/db.changelog-master.xml
 
 openweather:
-  api-key: 0c42ff@13e5b512602ccacd97da9191
+  api-key: f9c8a98ced7e37866436f764c3b830d9
   base-url: https://api.openweathermap.org
   geocoding-path: /geo/1.0/direct
   weather-path: /data/2.5/weather

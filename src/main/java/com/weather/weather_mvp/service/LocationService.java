@@ -1,5 +1,6 @@
 package com.weather.weather_mvp.service;
 
+import com.weather.weather_mvp.dto.GeocodingResponse;
 import com.weather.weather_mvp.dto.LocationDto;
 import com.weather.weather_mvp.dto.LocationResponseDto;
 import com.weather.weather_mvp.entity.Location;
@@ -22,6 +23,7 @@ import java.util.stream.Collectors;
 public class LocationService {
     private final LocationRepository locationRepository;
     private final UserRepository userRepository;
+    private final OpenWeatherService openWeatherService;
 
     @Cacheable(value = "locations", key = "#userId")
     @Transactional(readOnly = true)
@@ -63,14 +65,21 @@ public class LocationService {
     }
 
     private LocationDto mapToLocationDto(Location location) {
+        BigDecimal temperature = openWeatherService
+                .getWeatherByCoordinates(location.getLatitude(), location.getLongitude())
+                .getMainInfo()
+                .getTemp();
+
         return LocationDto.builder()
                 .id(location.getId().intValue())
                 .name(location.getName())
                 .latitude(location.getLatitude())
                 .longitude(location.getLongitude())
-                // TODO: Имплементировать получение реальной температуры, когда будет готов OpenWeather API
-                .temperature(null)
+                .temperature(temperature)
                 .build();
     }
 
+    public List<GeocodingResponse> searchLocationsByName(String name) {
+        return openWeatherService.searchLocationsByName(name);
+    }
 }

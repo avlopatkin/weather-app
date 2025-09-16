@@ -1,0 +1,5 @@
+openweather:
+  api-key: test-fake-api-key-for-tests
+  base-url: https://api.openweathermap.org
+  geocoding-path: /geo/1.0/direct
+  weather-path: /data/2.5/weather
