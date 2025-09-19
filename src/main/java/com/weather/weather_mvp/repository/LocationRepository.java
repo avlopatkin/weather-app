@@ -18,5 +18,5 @@ public interface LocationRepository extends JpaRepository<Location, Long> {
 
     @Modifying
     @Query("DELETE FROM Location l WHERE l.id = :locationId")
-    int deleteByIdAndUserId(@Param("locationId") Long locationId);
+    int customDeleteById(@Param("locationId") Long locationId);
 }

@@ -62,11 +62,10 @@ public class LocationService {
     @Transactional
     @CacheEvict(value = "locations", key = "#userId")
     public void deleteLocation(Long userId, Long locationId) {
-        if (!locationRepository.existsById(locationId)) {
+        int deletedRows = locationRepository.customDeleteById(locationId);
+        if (deletedRows == 0) {
             throw new ResourceNotFoundException("Location not found with id: " + locationId + " for user: " + userId);
         }
-
-        locationRepository.deleteById(locationId);
     }
 
     private LocationDto mapToLocationDto(Location location) {
