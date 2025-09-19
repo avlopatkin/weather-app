@@ -1,5 +1,6 @@
 package com.weather.weather_mvp.service;
 
+import com.weather.weather_mvp.dto.GeocodingResponse;
 import com.weather.weather_mvp.dto.LocationDto;
 import com.weather.weather_mvp.dto.LocationResponseDto;
 import com.weather.weather_mvp.entity.Location;
@@ -29,6 +30,9 @@ class LocationServiceTest {
 
     @Mock
     private UserRepository userRepository;
+
+    @Mock
+    private OpenWeatherService openWeatherService;
 
     @InjectMocks
     private LocationService locationService;
@@ -80,21 +84,38 @@ class LocationServiceTest {
     void deleteLocation_ShouldDeleteSuccessfully() {
         long userId = 1L;
         long locationId = 100L;
-        when(locationRepository.deleteByIdAndUserId(locationId, userId)).thenReturn(1);
+        when(locationRepository.customDeleteById(locationId)).thenReturn(1);
 
         locationService.deleteLocation(userId, locationId);
 
-        verify(locationRepository, times(1)).deleteByIdAndUserId(locationId, userId);
+        verify(locationRepository, times(1)).customDeleteById(locationId);
     }
 
     @Test
     void deleteLocation_ShouldThrowException_WhenLocationNotFound() {
         long userId = 1L;
         long locationId = 999L;
-        when(locationRepository.deleteByIdAndUserId(locationId, userId)).thenReturn(0);
+        when(locationRepository.customDeleteById(locationId)).thenReturn(0);
 
         assertThrows(ResourceNotFoundException.class, () -> locationService.deleteLocation(userId, locationId));
 
-        verify(locationRepository, times(1)).deleteByIdAndUserId(locationId, userId);
+        verify(locationRepository, times(1)).customDeleteById(locationId);
+    }
+
+    @Test
+    void searchLocationsByName_ShouldReturnGeocodingResponse() {
+        GeocodingResponse geocodingResponse = new GeocodingResponse();
+        geocodingResponse.setName("Paris");
+        geocodingResponse.setCountry("FR");
+
+        when(openWeatherService.searchLocationsByName("Paris"))
+                .thenReturn(List.of(geocodingResponse));
+
+        List<GeocodingResponse> result = locationService.searchLocationsByName("Paris");
+
+        assertThat(result).isNotNull();
+        assertThat(result).hasSize(1);
+        assertThat(result.get(0).getName()).isEqualTo("Paris");
+        assertThat(result.get(0).getCountry()).isEqualTo("FR");
     }
 }

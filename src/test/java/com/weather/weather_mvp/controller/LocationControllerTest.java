@@ -1,5 +1,8 @@
 package com.weather.weather_mvp.controller;
 
+import com.weather.weather_mvp.dto.GeocodingResponse;
+import com.weather.weather_mvp.dto.WeatherResponse;
+import com.weather.weather_mvp.service.OpenWeatherService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -12,14 +15,20 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
+import java.math.BigDecimal;
+import java.util.List;
+
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -45,9 +54,20 @@ class LocationControllerTest {
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
+    @MockitoBean
+    private OpenWeatherService openWeatherService;
+
     @BeforeEach
     void setUp() {
         jdbcTemplate.update("INSERT INTO users (id, login, password) VALUES (1, 'testuser', 'password')");
+
+        WeatherResponse weatherResponse = new WeatherResponse();
+        WeatherResponse.MainInfo mainInfo = new WeatherResponse.MainInfo();
+        mainInfo.setTemp(new BigDecimal("20.0"));
+        weatherResponse.setMainInfo(mainInfo);
+
+        when(openWeatherService.getWeatherByCoordinates(any(BigDecimal.class), any(BigDecimal.class)))
+                .thenReturn(weatherResponse);
     }
 
     @AfterEach
@@ -69,7 +89,7 @@ class LocationControllerTest {
                 .andExpect(jsonPath("$[0].name", is("Moscow")))
                 .andExpect(jsonPath("$[0].latitude", is(55.75)))
                 .andExpect(jsonPath("$[0].longitude", is(37.61)))
-                .andExpect(jsonPath("$[0].temperature").isEmpty());
+                .andExpect(jsonPath("$[0].temperature", is(20.0)));
     }
 
     @Test
@@ -105,5 +125,16 @@ class LocationControllerTest {
     void deleteLocation_ShouldReturnNotFound() throws Exception {
         mockMvc.perform(delete("/api/locations/999"))
                 .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @DisplayName("GET /api/locations/search")
+    void searchLocationsByName_ShouldReturnGeocodingList() throws Exception {
+        when(openWeatherService.searchLocationsByName("Paris"))
+                .thenReturn(List.of(new GeocodingResponse()));
+
+        mockMvc.perform(get("/api/locations/search").param("name", "Paris"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", hasSize(1)));
     }
 }

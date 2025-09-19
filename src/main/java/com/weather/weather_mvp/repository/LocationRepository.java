@@ -17,6 +17,6 @@ public interface LocationRepository extends JpaRepository<Location, Long> {
     List<Location> findAllByUser(@Param("user") User user);
 
     @Modifying
-    @Query("DELETE FROM Location l WHERE l.id = :locationId AND l.user.id = :userId")
-    int deleteByIdAndUserId(@Param("locationId") Long locationId, @Param("userId") Long userId);
+    @Query("DELETE FROM Location l WHERE l.id = :locationId")
+    int customDeleteById(@Param("locationId") Long locationId);
 }

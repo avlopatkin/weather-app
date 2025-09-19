@@ -1,5 +1,6 @@
 package com.weather.weather_mvp.service;
 
+import com.weather.weather_mvp.dto.GeocodingResponse;
 import com.weather.weather_mvp.dto.LocationDto;
 import com.weather.weather_mvp.dto.LocationResponseDto;
 import com.weather.weather_mvp.entity.Location;
@@ -22,6 +23,7 @@ import java.util.stream.Collectors;
 public class LocationService {
     private final LocationRepository locationRepository;
     private final UserRepository userRepository;
+    private final OpenWeatherService openWeatherService;
 
     @Cacheable(value = "locations", key = "#userId")
     @Transactional(readOnly = true)
@@ -32,7 +34,12 @@ public class LocationService {
         List<Location> locations = locationRepository.findAllByUser(user);
 
         return locations.stream()
-                .map(this::mapToLocationDto)
+                .map(location -> {
+                    LocationDto dto = mapToLocationDto(location);
+                    BigDecimal temperature = getTemperatureForLocation(location);
+                    dto.setTemperature(temperature);
+                    return dto;
+                })
                 .collect(Collectors.toList());
     }
 
@@ -55,8 +62,7 @@ public class LocationService {
     @Transactional
     @CacheEvict(value = "locations", key = "#userId")
     public void deleteLocation(Long userId, Long locationId) {
-        int deletedRows = locationRepository.deleteByIdAndUserId(locationId, userId);
-
+        int deletedRows = locationRepository.customDeleteById(locationId);
         if (deletedRows == 0) {
             throw new ResourceNotFoundException("Location not found with id: " + locationId + " for user: " + userId);
         }
@@ -68,9 +74,17 @@ public class LocationService {
                 .name(location.getName())
                 .latitude(location.getLatitude())
                 .longitude(location.getLongitude())
-                // TODO: Имплементировать получение реальной температуры, когда будет готов OpenWeather API
-                .temperature(null)
                 .build();
     }
 
+    private BigDecimal getTemperatureForLocation(Location location) {
+        return openWeatherService
+                .getWeatherByCoordinates(location.getLatitude(), location.getLongitude())
+                .getMainInfo()
+                .getTemp();
+    }
+
+    public List<GeocodingResponse> searchLocationsByName(String name) {
+        return openWeatherService.searchLocationsByName(name);
+    }
 }
