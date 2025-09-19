@@ -84,22 +84,22 @@ class LocationServiceTest {
     void deleteLocation_ShouldDeleteSuccessfully() {
         long userId = 1L;
         long locationId = 100L;
-        when(locationRepository.deleteByIdAndUserId(locationId, userId)).thenReturn(1);
+        when(locationRepository.deleteByIdAndUserId(locationId)).thenReturn(1);
 
         locationService.deleteLocation(userId, locationId);
 
-        verify(locationRepository, times(1)).deleteByIdAndUserId(locationId, userId);
+        verify(locationRepository, times(1)).deleteByIdAndUserId(locationId);
     }
 
     @Test
     void deleteLocation_ShouldThrowException_WhenLocationNotFound() {
         long userId = 1L;
         long locationId = 999L;
-        when(locationRepository.deleteByIdAndUserId(locationId, userId)).thenReturn(0);
+        when(locationRepository.deleteByIdAndUserId(locationId)).thenReturn(0);
 
         assertThrows(ResourceNotFoundException.class, () -> locationService.deleteLocation(userId, locationId));
 
-        verify(locationRepository, times(1)).deleteByIdAndUserId(locationId, userId);
+        verify(locationRepository, times(1)).deleteByIdAndUserId(locationId);
     }
 
     @Test

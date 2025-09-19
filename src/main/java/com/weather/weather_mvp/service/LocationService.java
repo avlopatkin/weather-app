@@ -34,7 +34,12 @@ public class LocationService {
         List<Location> locations = locationRepository.findAllByUser(user);
 
         return locations.stream()
-                .map(this::mapToLocationDto)
+                .map(location -> {
+                    LocationDto dto = mapToLocationDto(location);
+                    BigDecimal temperature = getTemperatureForLocation(location);
+                    dto.setTemperature(temperature);
+                    return dto;
+                })
                 .collect(Collectors.toList());
     }
 
@@ -57,26 +62,27 @@ public class LocationService {
     @Transactional
     @CacheEvict(value = "locations", key = "#userId")
     public void deleteLocation(Long userId, Long locationId) {
-        int deletedRows = locationRepository.deleteByIdAndUserId(locationId, userId);
-
-        if (deletedRows == 0) {
+        if (!locationRepository.existsById(locationId)) {
             throw new ResourceNotFoundException("Location not found with id: " + locationId + " for user: " + userId);
         }
+
+        locationRepository.deleteById(locationId);
     }
 
     private LocationDto mapToLocationDto(Location location) {
-        BigDecimal temperature = openWeatherService
-                .getWeatherByCoordinates(location.getLatitude(), location.getLongitude())
-                .getMainInfo()
-                .getTemp();
-
         return LocationDto.builder()
                 .id(location.getId().intValue())
                 .name(location.getName())
                 .latitude(location.getLatitude())
                 .longitude(location.getLongitude())
-                .temperature(temperature)
                 .build();
+    }
+
+    private BigDecimal getTemperatureForLocation(Location location) {
+        return openWeatherService
+                .getWeatherByCoordinates(location.getLatitude(), location.getLongitude())
+                .getMainInfo()
+                .getTemp();
     }
 
     public List<GeocodingResponse> searchLocationsByName(String name) {
