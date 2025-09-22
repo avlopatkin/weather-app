@@ -48,4 +48,48 @@
         </sql>
     </changeSet>
 
+    <changeSet id="005-add-user-email-column" author="andreilopatkin">
+        <sql>
+            <![CDATA[
+            ALTER TABLE users ADD COLUMN IF NOT EXISTS email VARCHAR(255);
+            ]]>
+        </sql>
+    </changeSet>
+
+    <changeSet id="006-create-user-roles-table" author="andreilopatkin">
+        <sql>
+            <![CDATA[
+            CREATE TABLE IF NOT EXISTS user_roles (
+            user_id BIGINT NOT NULL,
+            role VARCHAR(50) NOT NULL,
+            CONSTRAINT fk_user_roles_user_id FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+                );
+            ]]>
+        </sql>
+    </changeSet>
+
+    <changeSet id="007-add-user-roles-index" author="andreilopatkin">
+        <sql>
+            <![CDATA[
+            CREATE INDEX IF NOT EXISTS idx_user_roles_user_id ON user_roles(user_id);
+            ]]>
+        </sql>
+    </changeSet>
+
+    <changeSet id="008-add-users-email-unique-index" author="andreilopatkin">
+        <sql>
+            <![CDATA[
+            CREATE UNIQUE INDEX IF NOT EXISTS idx_users_email ON users(email);
+            ]]>
+        </sql>
+    </changeSet>
+
+    <changeSet id="009-populate-test-emails" author="andreilopatkin">
+        <sql>
+            <![CDATA[
+            UPDATE users SET email = login || '@test.com' WHERE email IS NULL OR email = '';
+            ]]>
+        </sql>
+    </changeSet>
+
 </databaseChangeLog>

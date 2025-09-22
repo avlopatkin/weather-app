@@ -17,3 +17,7 @@ openweather:
   base-url: https://api.openweathermap.org
   geocoding-path: /geo/1.0/direct
   weather-path: /data/2.5/weather
+
+jwt:
+  secret: ${JWT_SECRET:6olHddRHkVqld853s3MKhxYEyz8yY3NUjC5LV1anGvgYuu+j7d5sKIO3aVuCcW8Y09Z5PlctSMrms/vLV4IEUg==}
+  expiration: ${JWT_EXPIRATION:900000}
