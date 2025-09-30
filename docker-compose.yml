@@ -1,0 +1,83 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: weather-postgres
+    restart: unless-stopped
+
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-weatherdb}
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      PGDATA: /var/lib/postgresql/data/pgdata
+
+    ports:
+      - "${POSTGRES_LOCAL_PORT:-5432}:5432"
+
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+    networks:
+      - weather-network
+
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-weatherdb}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+  app:
+    image: avlopatkin/weather-app:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+
+    container_name: weather-app
+    restart: unless-stopped
+
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB:-weatherdb}
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-postgres}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+
+      SPRING_JPA_HIBERNATE_DDL_AUTO: validate
+      SHOW_SQL: ${SHOW_SQL:-false}
+
+      OPENWEATHER_API_KEY: ${OPENWEATHER_API_KEY:-f9c8a98ced7e37866436f764c3b830d9}
+      OPENWEATHER_BASE_URL: ${OPENWEATHER_BASE_URL:-https://api.openweathermap.org}
+      OPENWEATHER_GEOCODING_PATH: ${OPENWEATHER_GEOCODING_PATH:-/geo/1.0/direct}
+      OPENWEATHER_WEATHER_PATH: ${OPENWEATHER_WEATHER_PATH:-/data/2.5/weather}
+
+      JWT_SECRET: ${JWT_SECRET:-6olHddRHkVqld853s3MKhxYEyz8yY3NUjC5LV1anGvgYuu+j7d5sKIO3aVuCcW8Y09Z5PlctSMrms/vLV4IEUg==}
+      JWT_EXPIRATION: ${JWT_EXPIRATION:-900000}
+
+      SERVER_PORT: 8080
+
+      JAVA_OPTS: -Xmx512m -Xms256m
+
+    ports:
+      - "${SPRING_LOCAL_PORT:-8080}:8080"
+
+    networks:
+      - weather-network
+
+    healthcheck:
+      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:8080/actuator/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+volumes:
+  postgres_data:
+    driver: local
+
+networks:
+  weather-network:
+    driver: bridge
+    name: weather-network

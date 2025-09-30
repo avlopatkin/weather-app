@@ -39,7 +39,7 @@ class LocationServiceTest {
 
     @Test
     void getLocationsForUser_ShouldReturnLocations_WhenUserExists() {
-        User testUser = new User("testuser", "password");
+        User testUser = new User("testuser", "testuser@example.com", "password");
         testUser.setId(1L);
         Location testLocation = new Location("Moscow", new BigDecimal("55.75"), new BigDecimal("37.61"), testUser);
         testLocation.setId(100L);
@@ -64,7 +64,7 @@ class LocationServiceTest {
 
     @Test
     void addLocation_ShouldAddLocationSuccessfully() {
-        User testUser = new User("testuser", "password");
+        User testUser = new User("testuser", "testuser@example.com", "password");
         testUser.setId(1L);
         Location testLocation = new Location("Moscow", new BigDecimal("55.75"), new BigDecimal("37.61"), testUser);
         testLocation.setId(100L);

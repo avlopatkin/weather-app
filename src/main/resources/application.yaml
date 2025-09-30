@@ -2,22 +2,39 @@ spring:
   application:
     name: weather-app
   datasource:
-    url: jdbc:postgresql://localhost:5432/weatherdb
-    username: postgres
-    password: ''
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/weatherdb}
+    username: ${SPRING_DATASOURCE_USERNAME:postgres}
+    password: ${SPRING_DATASOURCE_PASSWORD:}
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
-      ddl-auto: validate
+      ddl-auto: ${SPRING_JPA_HIBERNATE_DDL_AUTO:validate}
+    show-sql: ${SHOW_SQL:false}
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.PostgreSQLDialect
   liquibase:
     change-log: classpath:/db/changelog/db.changelog-master.xml
 
 openweather:
-  api-key: f9c8a98ced7e37866436f764c3b830d9
-  base-url: https://api.openweathermap.org
-  geocoding-path: /geo/1.0/direct
-  weather-path: /data/2.5/weather
+  api-key: ${OPENWEATHER_API_KEY:f9c8a98ced7e37866436f764c3b830d9}
+  base-url: ${OPENWEATHER_BASE_URL:https://api.openweathermap.org}
+  geocoding-path: ${OPENWEATHER_GEOCODING_PATH:/geo/1.0/direct}
+  weather-path: ${OPENWEATHER_WEATHER_PATH:/data/2.5/weather}
 
 jwt:
   secret: ${JWT_SECRET:6olHddRHkVqld853s3MKhxYEyz8yY3NUjC5LV1anGvgYuu+j7d5sKIO3aVuCcW8Y09Z5PlctSMrms/vLV4IEUg==}
   expiration: ${JWT_EXPIRATION:900000}
+
+server:
+  port: ${SERVER_PORT:8080}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: when-authorized

@@ -1,6 +1,7 @@
 package com.weather.weather_mvp.controller;
 
 import com.weather.weather_mvp.dto.LoginRequest;
+import com.weather.weather_mvp.dto.LoginResponseDto;
 import com.weather.weather_mvp.dto.UserRegistrationRequest;
 import com.weather.weather_mvp.dto.UserResponseDto;
 import com.weather.weather_mvp.service.AuthService;
@@ -22,8 +23,8 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<UserResponseDto> login(@RequestBody LoginRequest request) {
-        UserResponseDto response = authService.login(request.getLogin(), request.getPassword());
+    public ResponseEntity<LoginResponseDto> login(@RequestBody LoginRequest request) {  // ← Изменили тип
+        LoginResponseDto response = authService.login(request.getLogin(), request.getPassword());
         return ResponseEntity.ok(response);
     }
 
